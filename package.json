@@ -1,0 +1,18 @@
+{
+  "author": "Kevin Heritage",
+  "name": "functional-file-searcher",
+  "description": "lol for now",
+  "version": "0.0.0",
+  "repository": {
+    "url": "https://github.com/slugger7/functional-file-searcher"
+  },
+  "main": "./lib/ffs",
+  "keywords": [
+    "functional",
+    "file",
+    "searcher"
+  ],
+  "dependencies": {
+    "ramda": "^0.25.0"
+  }
+}
