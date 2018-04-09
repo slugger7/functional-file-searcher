@@ -7,6 +7,9 @@
     "url": "https://github.com/slugger7/functional-file-searcher"
   },
   "main": "./lib/ffs",
+  "scripts": {
+    "test": "mocha"
+  },
   "keywords": [
     "functional",
     "file",
@@ -14,5 +17,10 @@
   ],
   "dependencies": {
     "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5",
+    "proxyquire-2": "^1.0.7"
   }
 }

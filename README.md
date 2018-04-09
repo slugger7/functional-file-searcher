@@ -52,7 +52,7 @@ console.log('The files in the directory: ', filesInSomeDirectory);
 ```
 const { filesByName } = require('functional-file-searcher');
 
-const filesWithName = filesByName('file');
+const filesWithName = filesByName('theDirectory, 'file');
 
 console.log('The files that contain "file": ', filesWithName;
 ```
@@ -70,5 +70,5 @@ console.log('The files that contain "file": ', filesWithName;
 ```
 const { directories } = require('functional-file-searcher');
 
-const dirs = directories()
+const dirs = directories('')
 ```
