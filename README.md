@@ -1,3 +1,1 @@
-# A functional way to search for files
-
-Pairs well with ramda js
+# This package is not complete yet use at own risk
