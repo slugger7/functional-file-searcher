@@ -1,7 +1,8 @@
 const { assert } = require('chai');
-const fsSpy = require('./fsmock.js');
+const fsSpy = require('./tools/fsmock.js');
 const proxyquire = require('proxyquire-2');
 const {
+  inDir,
   directories,
   files,
   filesByExtension,
@@ -9,83 +10,124 @@ const {
   fileByName,
   directoriesByName,
   directoryByName,
-  retrieveRecursive
+  recursiveFilter,
+  recursiveFind
 } = proxyquire('../lib/ffs.js', {
   fs: fsSpy
 });
 
 describe(`Testing the ffs`, () => {
-  const dir = 'theDirectory';
+  const dir = 'root';
+  let root;
 
-  it('should return all of the files in the base directory', () => {
-    const expected = [
-      `${dir}/fileOne`,
-      `${dir}/fileTwo.type`,
-      `${dir}/something.txt`
-    ];
-
-    const actual = files(dir);
-
-    assert.deepEqual(actual, expected);
+  beforeEach(() => {
+    root = inDir(dir);
   });
 
-  it('should return all of the files of type "type" in the base directory', () => {
-    const expected = [
-      `${dir}/fileTwo.type`
-    ];
+  describe('file fetchers', () => {
+    describe('non-recursive', () => {
+      it(`should fetch all of the files in the ${dir} directory`, () => {
+        const expected = [
+          `${dir}/someText.txt`,
+          `${dir}/someImage.jpg`,
+          `${dir}/someCode.js`,
+          `${dir}/file`
+        ];
 
-    const actual = filesByExtension(dir, 'type');
+        const actual = root(files);
 
-    assert.deepEqual(actual, expected);
-  });
+        assert.deepEqual(actual, expected);
+      });
 
-  it('should return all of the files that contain the name "file" in the base directory', () => {
-    const expected = [
-      `${dir}/fileOne`,
-      `${dir}/fileTwo.type`
-    ];
+      it(`should fetch all of the files that contain "some" in the ${dir} directory`, () => {
+        const expected = [
+          `${dir}/someText.txt`,
+          `${dir}/someImage.jpg`,
+          `${dir}/someCode.js`
+        ];
 
-    const actual = filesByName(dir, 'file');
+        const actual = root(filesByName('some'));
 
-    assert.deepEqual(actual, expected);
-  });
+        assert.deepEqual(actual, expected);
+      });
 
-  it('should return the file matching the name "fileOne" in the base directory', () => {
-    const expected = `${dir}/fileOne`;
+      it(`should fetch a file that has the name of "someText.txt" in the ${dir} directory`, () => {
+        const expected = `${dir}/someText.txt`;
 
-    const actual = fileByName(dir, 'fileOne');
+        const actual = root(fileByName('someText.txt'));
 
-    assert.equal(actual, expected);
-  });
+        assert.equal(actual, expected);
+      });
 
-  it('should return all the directiories in the base directory', () => {
-    const expected = [
-      `${dir}/nestedDirectory`,
-      `${dir}/anotherDirectory`,
-      `${dir}/notThisOne`
-    ];
+      it(`should return all of the files in ${dir} directory that have the file extension of "txt"`, () => {
+        const expected = [
+          `${dir}/someText.txt`
+        ];
 
-    const actual = directories(dir);
+        const actual = root(filesByExtension('txt'));
 
-    assert.deepEqual(actual, expected);
-  });
+        assert.deepEqual(actual, expected);
+      });
+    });
 
-  it('should return all of the directories that contain "directory" in the base directory', () => {
-    const expected = [
-      `${dir}/nestedDirectory`,
-      `${dir}/anotherDirectory`
-    ];
+    describe('recursive', () => {
+      describe('filter', () => {
+        beforeEach(() => {
+          root = operation => inDir(dir, recursiveFilter(operation));
+        });
 
-    const actual = directoriesByName(dir, 'Directory');
+        it(`should get all of the files nested within ${dir} directory`, () => {
+          const expected = [
+            `${dir}/someText.txt`,
+            `${dir}/someImage.jpg`,
+            `${dir}/someCode.js`,
+            `${dir}/file`,
+            `${dir}/subDirectory/nestedImage.jpg`,
+            `${dir}/subDirectory/nestedCode.js`,
+            `${dir}/subDirectory/nestedText.txt`,
+            `${dir}/subDirectory/file`
+          ];
 
-    assert.deepEqual(actual, expected);
-  });
+          const actual = root(files);
 
-  it('should find a directory by the name of "notThisOne" in the base directory', () => {
-    const expected = `${dir}/notThisOne`;
+          assert.deepEqual(actual, expected);
+        });
 
-    const actual = directoryByName(dir, 'notThisOne');
+        it(`should get all of the files that contain the "Image" word in the name from ${dir} directory`, () => {
+          const expected = [
+            `${dir}/someImage.jpg`,
+            `${dir}/subDirectory/nestedImage.jpg`
+          ];
 
-    assert.equal(actual, expected);
+          const actual = root(filesByName('Image'));
+
+          assert.deepEqual(actual, expected);
+        });
+
+        it(`should get all of the files with the "js" extension in the ${dir} directory`, () => {
+          const expected = [
+            `${dir}/someCode.js`,
+            `${dir}/subDirectory/nestedCode.js`
+          ];
+
+          const actual = root(filesByExtension('js'));
+
+          assert.deepEqual(actual, expected);
+        });
+      });
+      describe('find', () => {
+        beforeEach(() => {
+          root = operation => inDir(dir, recursiveFind(operation));
+        });
+
+        it(`should find the file "nestedText.txt" in the directory structure`, () => {
+          const expected = `${dir}/subDirectory/nestedText.txt`;
+
+          const actual = root(fileByName('nestedText.txt'));
+
+          assert.equal(actual, expected);
+        });
+      });
+    });
   });
 });

@@ -10,23 +10,26 @@ const file = {
 }
 
 const directoryList = {
-  theDirectory: {
+  root: {
     isDirectory: T,
     isFile: F,
-    fileOne: file,
-    "fileTwo.type": file,
-    "something.txt": file,
-    nestedDirectory: {
+    "someText.txt": file,
+    "someImage.jpg": file,
+    "someCode.js": file,
+    file: file,
+    subDirectory: {
       isDirectory: T,
       isFile: F,
-      fileInNestedDirectory: file,
-      "fileInNestedDirectory.type": file
+      "nestedImage.jpg": file,
+      "nestedCode.js": file,
+      "nestedText.txt": file,
+      file: file
     },
-    anotherDirectory: {
+    secondSubDirectory: {
       isFile: F,
       isDirectory: T
     },
-    notThisOne: {
+    secondDirectory: {
       isFile: F,
       isDirectory: T
     }
